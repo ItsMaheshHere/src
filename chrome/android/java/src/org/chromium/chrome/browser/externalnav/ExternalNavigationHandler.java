@@ -526,20 +526,10 @@ public class ExternalNavigationHandler {
         }
 
         try {
-            if (params.isIncognito() && !mDelegate.willChromeHandleIntent(intent)) {
-                // This intent may leave Chrome.  Warn the user that incognito does not carry over
-                // to apps out side of Chrome.
-                if (!mDelegate.startIncognitoIntent(intent, params.getReferrerUrl(),
-                            hasBrowserFallbackUrl ? browserFallbackUrl : null, params.getTab(),
-                            params.shouldCloseContentsOnOverrideUrlLoadingAndLaunchIntent(),
-                            shouldProxyForInstantApps)) {
-                    if (DEBUG) Log.i(TAG, "NO_OVERRIDE: Failed to show incognito alert dialog.");
-                    return OverrideUrlLoadingResult.NO_OVERRIDE;
-                }
-                if (DEBUG) Log.i(TAG, "OVERRIDE_WITH_ASYNC_ACTION: Incognito navigation out");
-                return OverrideUrlLoadingResult.OVERRIDE_WITH_ASYNC_ACTION;
+            // Force stay inside Chrome for incognito – never launch external apps
+            if (params.isIncognito()) {
+                return OverrideUrlLoadingResult.NO_OVERRIDE;
             }
-
             // Some third-party app launched Chrome with an intent, and the URL got redirected. The
             // user has explicitly chosen Chrome over other intent handlers, so stay in Chrome
             // unless there was a new intent handler after redirection or Chrome cannot handle it

@@ -1,0 +1,42 @@
+name: Build Chromium APK
+
+on:
+  workflow_dispatch: # manual trigger
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jdk python3 python3-pip gnupg zip
+
+      - name: Setup depot_tools
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
+      - name: Generate build files
+        run: |
+          gn gen out/Default --args='
+            is_debug=false
+            is_official_build=true
+            chrome_public_package="com.mahi.chromium"
+          '
+
+      - name: Build APK
+        run: autoninja -C out/Default chrome_public_apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium-apk
+          path: out/Default/apks/ChromePublic.apk

@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4   # updated to v4
 
       - name: Install dependencies
         run: |
@@ -36,7 +36,7 @@ jobs:
         run: autoninja -C out/Default chrome_public_apk
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   # updated to v4
         with:
           name: chromium-apk
           path: out/Default/apks/ChromePublic.apk
